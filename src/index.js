@@ -73,7 +73,7 @@ async function onNextImagesAdd() {
 function ifError() {
     clearAll();
     buttonHidden();
-    Notiflix.Report.info('Oh', 'Something get wrong, please try again', 'Okay');
+    Notiflix.Report.info('Something get wrong, please try again');
 };
 
 function clearAll() {
