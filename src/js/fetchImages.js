@@ -41,6 +41,4 @@ export async function fetchImages(searchValue) {
 //         });
 // };
 
-export function resetPage() {
-  page = DEFAULT_PAGE;
-}
+

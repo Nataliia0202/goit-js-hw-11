@@ -25,29 +25,29 @@ async function onSubmit(event) {
     event.preventDefault();
     searchValue = input.value.trim();
     if (searchValue === '') {
-        clearAll();
-        buttonHidden();
+        gallery.innerHTML = '';
+        buttonLoadMore.classList.add('visually-hidden');
         Notiflix.Notify.info('You cannot search by empty field, try again.');
         return;
     } else {
         try {
-            resetPage();
+            page = DEFAULT_PAGE;
             const result = await fetchImages(searchValue);
             if (result.hits < 1) {
                 form.reset();
-                clearAll();
-                buttonHidden();
+                gallery.innerHTML = '';
+                buttonLoadMore.classList.add('visually-hidden');
                 Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
             } else {
                 form.reset();
                 gallery.innerHTML = imageCreate(result.hits);
                 simpleLightbox = new SimpleLightbox(".gallery a", optionsSL).refresh();
-                buttonUnHidden();
+                buttonLoadMore.classList.remove('visually-hidden');
                 
                 Notiflix.Notify.success(`Hooray! We found ${result.totalHits} images.`);
             };
         } catch (error) {
-            ifError();
+            onError();
         };
     };
 };
@@ -59,31 +59,20 @@ async function onNextImagesAdd() {
         const result = await fetchImages(searchValue);
         const totalPages = page * perPage;
             if (result.totalHits <= totalPages) {
-                buttonHidden();
+                buttonLoadMore.classList.add('visually-hidden');
                 Notiflix.Report.info('Wow', "We're sorry, but you've reached the end of search results.", 'Okay');
             }
         gallery.insertAdjacentHTML('beforeend', imageCreate(result.hits));
         
         simpleLightbox = new SimpleLightbox(".gallery a", optionsSL).refresh();
     } catch (error) {
-        ifError();
+        onError();
     };
 };
 
-function ifError() {
-    clearAll();
-    buttonHidden();
+function onError() {
+    gallery.innerHTML = '';
+    buttonLoadMore.classList.add('visually-hidden');
     Notiflix.Report.info('Something get wrong, please try again');
 };
 
-function clearAll() {
-    gallery.innerHTML = '';
-};
-
-function buttonHidden() {
-    buttonLoadMore.classList.add("visually-hidden");
-};
-
-function buttonUnHidden() {
-    buttonLoadMore.classList.remove("visually-hidden");
-};
