@@ -1,13 +1,35 @@
+import axios from 'axios';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import Notiflix from 'notiflix';
-import { fetchImages, DEFAULT_PAGE, page, perPage } from './js/fetchImages';
+// import { fetchImages, DEFAULT_PAGE, page, perPage } from './js/fetchImages';
 import { imageCreate } from './js/imageCreate';
 
 const form = document.querySelector('.search-form');
 const input = document.querySelector('.input');
 const gallery = document.querySelector('.gallery');
 const buttonLoadMore = document.querySelector('.load-more');
+
+const DEFAULT_PAGE = 1;
+let page = DEFAULT_PAGE;
+
+const perPage = 40;
+
+async function fetchImages(searchValue) {
+  const searchParams = new URLSearchParams({
+    key: '30517728-589fd0b92afb9aae41e5e4126',
+    q: searchValue,
+    image_type: 'photo',
+    orientation: 'horizontal',
+    safesearch: 'true',
+    per_page: perPage,
+    page,
+  });
+  const images = await axios
+    .get(`https://pixabay.com/api/?${searchParams}`)
+    .then((page += 1));
+  return images.data;
+}
 
 form.addEventListener('submit', onSubmit);
 buttonLoadMore.addEventListener('click', onNextImagesAdd);
@@ -22,59 +44,63 @@ const optionsSL = {
 let simpleLightbox;
 
 async function onSubmit(event) {
-    event.preventDefault();
-    searchValue = input.value.trim();
-    if (searchValue === '') {
-        gallery.innerHTML = '';
-        buttonLoadMore.classList.add('visually-hidden');
-        Notiflix.Notify.info('You cannot search by empty field, try again.');
-        return;
-    } else {
-        try {
-            page = DEFAULT_PAGE;
-            const result = await fetchImages(searchValue);
-            if (result.hits < 1) {
-                form.reset();
-                gallery.innerHTML = '';
-                buttonLoadMore.classList.add('visually-hidden');
-                Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
-            } else {
-                form.reset();
-                gallery.innerHTML = imageCreate(result.hits);
-                simpleLightbox = new SimpleLightbox(".gallery a", optionsSL).refresh();
-                buttonLoadMore.classList.remove('visually-hidden');
-                
-                Notiflix.Notify.success(`Hooray! We found ${result.totalHits} images.`);
-            };
-        } catch (error) {
-            onError();
-        };
-    };
-};
-
-async function onNextImagesAdd() {
-    
-    simpleLightbox.destroy();
-    try {
-        const result = await fetchImages(searchValue);
-        const totalPages = page * perPage;
-            if (result.totalHits <= totalPages) {
-                buttonLoadMore.classList.add('visually-hidden');
-                Notiflix.Report.info('Wow', "We're sorry, but you've reached the end of search results.", 'Okay');
-            }
-        gallery.insertAdjacentHTML('beforeend', imageCreate(result.hits));
-        
-        simpleLightbox = new SimpleLightbox(".gallery a", optionsSL).refresh();
-    } catch (error) {
-        onError();
-    };
-};
-
-function onError() {
+  event.preventDefault();
+  searchValue = input.value.trim();
+  if (searchValue === '') {
     gallery.innerHTML = '';
     buttonLoadMore.classList.add('visually-hidden');
-    Notiflix.Report.info('Something get wrong, please try again');
-};
+    Notiflix.Notify.info('You cannot search by empty field, try again.');
+    return;
+  } else {
+    try {
+      page = DEFAULT_PAGE;
+      const result = await fetchImages(searchValue);
+      if (result.hits < 1) {
+        form.reset();
+        gallery.innerHTML = '';
+        buttonLoadMore.classList.add('visually-hidden');
+        Notiflix.Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+      } else {
+        form.reset();
+        gallery.innerHTML = imageCreate(result.hits);
+        simpleLightbox = new SimpleLightbox('.gallery a', optionsSL).refresh();
+        buttonLoadMore.classList.remove('visually-hidden');
 
+        Notiflix.Notify.success(`Hooray! We found ${result.totalHits} images.`);
+      }
+    } catch (error) {
+      onError();
+    }
+  }
+}
+
+async function onNextImagesAdd() {
+  simpleLightbox.destroy();
+  try {
+    const result = await fetchImages(searchValue);
+    const totalPages = page * perPage;
+    if (result.totalHits <= totalPages) {
+      buttonLoadMore.classList.add('visually-hidden');
+      Notiflix.Report.info(
+        'Wow',
+        "We're sorry, but you've reached the end of search results.",
+        'Okay'
+      );
+    }
+    gallery.insertAdjacentHTML('beforeend', imageCreate(result.hits));
+
+    simpleLightbox = new SimpleLightbox('.gallery a', optionsSL).refresh();
+  } catch (error) {
+    onError();
+  }
+}
+
+function onError() {
+  gallery.innerHTML = '';
+  buttonLoadMore.classList.add('visually-hidden');
+  Notiflix.Report.info('Something get wrong, please try again');
+}
 
 // commit
