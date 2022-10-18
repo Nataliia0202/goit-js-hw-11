@@ -80,8 +80,9 @@ async function onNextImagesAdd() {
   simpleLightbox.destroy();
   try {
     const result = await fetchImages(searchValue);
-    const totalPages = page * perPage;
-    if (result.totalHits <= totalPages) {
+      const totalPages = page * perPage;
+      console.log(totalPages);
+      if (result.totalHits <= totalPages) {
       buttonLoadMore.classList.add('visually-hidden');
       Notiflix.Report.info(
         'Wow',
@@ -90,7 +91,7 @@ async function onNextImagesAdd() {
       );
     }
     gallery.insertAdjacentHTML('beforeend', imageCreate(result.hits));
-
+    smothScroll();
     simpleLightbox = new SimpleLightbox('.gallery a', optionsSL).refresh();
   } catch (error) {
     onError();
@@ -104,3 +105,41 @@ function onError() {
 }
 
 // commit
+const toTopBtn = document.querySelector('.btn-to-top');
+    
+window.addEventListener('scroll', onScroll);
+toTopBtn.addEventListener('click', onToTopBtn);
+
+function onScroll() {
+    const scrolled = window.pageYOffset;
+    const coords = document.documentElement.clientHeight;
+
+    if (scrolled > coords) {
+        toTopBtn.classList.add('btn-to-top--visible');
+    };
+    if (scrolled < coords) {
+        toTopBtn.classList.remove('btn-to-top--visible');
+    };
+};
+
+function onToTopBtn() {
+    if (window.pageYOffset > 0) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+};
+function smothScroll() {
+    const { height: cardHeight } =
+        document.querySelector(".gallery--card").firstElementChild.getBoundingClientRect();
+    window.scrollBy({
+    top: cardHeight * 3.9,
+    behavior: "smooth",
+});
+};
+
+
+
+
+
+
+
+

@@ -145,3 +145,31 @@ body {
     clip-path: inset(50%);
     margin: -1px;
 }
+
+.btn-to-top {
+    position: fixed;
+    bottom: 3vh;
+    right: 2vw;
+    z-index: 1;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 2px 6px 2px rgb(60 64 67 / 15%);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    background-color: var(--first-acent-color);
+    color: var(--just-white);
+    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1), color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-to-top:hover {
+    background-color: var(--just-white);
+    color: var(--first-acent-color);
+}
+.btn-to-top--visible {
+    opacity: 1;
+    visibility: visible;
+}
